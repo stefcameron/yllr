@@ -1,0 +1,96 @@
+//
+// JSCS (code style linting) rule settings.
+// @see http://jscs.info/rules.html
+//
+
+{
+  "plugins": [
+    "./jscs_plugins"
+  ],
+
+  //
+  // Plugin Rules
+  //
+
+  "scValidateIndentation": true,
+
+  //
+  // JSCS Built-in Rules
+  //
+
+  "disallowEmptyBlocks": true,
+  "disallowFunctionDeclarations": true, // always as expressions: more JS-like
+  "disallowImplicitTypeConversion": [], // allow any
+  "disallowKeywordsOnNewLine": ["else", "catch"],
+  "disallowKeywords": [], // allow any
+  "disallowMixedSpacesAndTabs": true, // JSHint should further enforce spaces only
+  "disallowMultipleLineBreaks": true, // add an empty comment if need more separation
+  "disallowMultipleLineStrings": true,
+  "disallowMultipleVarDecl": "strict",
+  "disallowNewlineBeforeBlockStatements": true, // also prevents semicolon-injection
+  "disallowOperatorBeforeLineBreak": ["."], // dot at start of next line when cascading
+  "disallowQuotedKeysInObjects": "allButReserved",
+  "disallowSpaceAfterObjectKeys": true,
+  "disallowSpaceAfterPrefixUnaryOperators": true,
+  "disallowSpaceBeforePostfixUnaryOperators": true,
+  "disallowSpacesInAnonymousFunctionExpression": {
+    "beforeOpeningRoundBrace": true
+  },
+  "disallowSpacesInCallExpression": true,
+  "disallowSpacesInFunctionDeclaration": {
+    "beforeOpeningRoundBrace": true
+  },
+  "disallowSpacesInFunctionExpression": {
+    "beforeOpeningRoundBrace": true
+  },
+  "disallowSpacesInFunction": {
+    "beforeOpeningRoundBrace": true
+  },
+  "disallowSpacesInNamedFunctionExpression": {
+    "beforeOpeningRoundBrace": true
+  },
+  "disallowSpacesInsideArrayBrackets": "all",
+  "disallowSpacesInsideObjectBrackets": "all",
+  "disallowSpacesInsideParentheses": true,
+  "disallowTrailingComma": true,
+  "disallowTrailingWhitespace": true,
+  "maximumLineLength": {
+    "value": 100, // really should be 80, but let's allow a 20 char buffer
+    "tabSize": 2,
+    "allowComments": true, // let comments break the rule (due to JSDoc syntax)
+    "allowUrlComments": true, // let long URLs break the rule
+    "allowRegex": true // let long regexs break the rule
+  },
+  "requireBlocksOnNewline": 1, // max of one statement in single-line inline function
+  "requireCamelCaseOrUpperCaseIdentifiers": true,
+  "requireCapitalizedConstructors": true,
+  "requireCommaBeforeLineBreak": true,
+  "requireCurlyBraces": [
+    "if",
+    "else",
+    "switch",
+    "for",
+    "while",
+    "do",
+    "try",
+    "catch"
+  ],
+  "requireLineBreakAfterVariableAssignment": true,
+  "requireLineFeedAtFileEnd": true,
+  "requireOperatorBeforeLineBreak": true,
+  "requireParenthesesAroundIIFE": true,
+  "requireSpaceAfterBinaryOperators": true,
+  "requireSpaceBeforeBinaryOperators": true,
+  "requireSpaceBeforeBlockStatements": true,
+  "requireSpaceBeforeKeywords": ["else", "catch"],
+  "requireSpaceBeforeObjectValues": true,
+  "requireSpaceBetweenArguments": true,
+  "requireSpacesInConditionalExpression": true,
+  "safeContextKeyword": ["that"],
+  "validateLineBreaks": "LF",
+  "validateParameterSeparator": ", ",
+  "validateQuoteMarks": {
+    "mark": "'",
+    "escape": true // allow use of doublequotes only to avoid escaping singlequotes
+  }
+}

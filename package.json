@@ -1,0 +1,46 @@
+{
+  "name": "yllr",
+  "version": "0.0.1",
+  "description": "Minimal runtime assertion library.",
+  "main": "gruntfile.js",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stefcameron/yllr.git"
+  },
+  "keywords": [
+    "assert",
+    "assertion",
+    "expect",
+    "expectation",
+    "runtime",
+    "small",
+    "mini",
+    "minimal"
+  ],
+  "author": {
+    "name": "Stefan Cameron",
+    "email": "stefan@stefcameron.com",
+    "url": "http://stefcameron.com/"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/stefcameron/yllr/blob/master/LICENSE"
+    }
+  ],
+  "bugs": {
+    "url": "https://github.com/stefcameron/yllr/issues"
+  },
+  "homepage": "https://github.com/stefcameron/yllr",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-clean": "^0.6.0",
+    "grunt-contrib-jshint": "^0.11.0",
+    "grunt-contrib-uglify": "^0.8.0",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-jscs": "^1.5.0"
+  }
+}

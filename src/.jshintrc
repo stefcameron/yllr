@@ -1,0 +1,17 @@
+//
+// source jsHint settings.
+// @see http://www.jshint.com/docs/options/
+//
+
+{
+  // Extend repository settings
+  "extends": "../.jshintrc",
+
+  // Environment options
+  "browser": true,
+  "node": false,
+  "globals": {
+    "define": true, // AMD
+    "module": true // CommonJS
+  }
+}

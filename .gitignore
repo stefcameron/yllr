@@ -19,7 +19,7 @@ sublime/*.sublime-workspace
 # Coverage directory used by tools like istanbul
 coverage_reports/
 
-# Compiled binary addons (http://nodejs.org/api/addons.html)
+# Compiled binary addons (http://nodejs.org/api/addons.html) and tmp build output
 build/
 
 # Dependency directory

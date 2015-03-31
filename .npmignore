@@ -1,2 +1,12 @@
+build/
+jscs_plugins/
+src/
+sublime/
+test/
+.bowerrc
+.jshintrc
+.travis.yml
 .git
 .gitignore
+gruntfile.js
+bower.json

@@ -1,4 +1,6 @@
 (function(global, factory) {
+  'use strict';
+
   if (typeof define === 'function' && define.amd) {
     define([], factory); // AMD
   } else if (typeof exports === 'object') {
@@ -84,7 +86,7 @@
     YllrError: YllrError,
 
     // methods
-    check: check
+    check: check,
 
     /**
      * The `yllr.config` namespace.

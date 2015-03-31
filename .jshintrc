@@ -1,0 +1,30 @@
+//
+// jsHint (code syntax linting) rule settings
+// @see http://www.jshint.com/docs/options/
+//
+
+{
+  // Enforced options, producing *more* warnings
+  "curly": true,
+  "eqeqeq": true,
+  "forin": true,
+  "latedef": true,
+  "noarg": true,
+  "undef": true,
+  "unused": "vars",
+  "strict": true,
+  "trailing": true,
+
+  // turn off until removed from jsLint (currently deprecated); JSCS checks this
+  "newcap": false,
+
+  // Relaxed options, producing *less* warnings
+  "expr": true,
+  "eqnull": true,
+  "loopfunc": true,
+  "sub": true,
+  "supernew": true,
+
+  // Environment options
+  "node": true
+}
