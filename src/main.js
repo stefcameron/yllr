@@ -28,7 +28,7 @@
 
       Super.call(this, message);
 
-      this.name = 'YllrError';
+      this.name = 'yllrError';
 
       tokens.forEach(function(token, i) {
         this.message = this.message.replace('{' + i + '}', '' + token);
