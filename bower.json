@@ -1,0 +1,41 @@
+{
+  "name": "yllr",
+  "version": "0.0.1",
+  "description": "minimal runtime assertion library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Stefan Cameron",
+      "email": "stefan@stefcameron.com",
+      "homepage": "http://stefcameron.com"
+    }
+  ],
+  "homepage": "https://github.com/stefcameron/yllr",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stefcameron/yllr.git"
+  },
+  "main": "dist/yllr.js",
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "assert",
+    "assertion",
+    "expect",
+    "expectation",
+    "runtime",
+    "small",
+    "mini",
+    "minimal"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
