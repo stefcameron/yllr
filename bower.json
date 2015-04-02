@@ -33,9 +33,13 @@
   ],
   "ignore": [
     "**/.*",
+    "gruntfile.js",
+    "build",
+    "jscs_plugins",
     "node_modules",
     "bower_components",
-    "test",
-    "tests"
+    "src",
+    "sublime",
+    "test"
   ]
 }

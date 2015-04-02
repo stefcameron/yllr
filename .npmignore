@@ -9,4 +9,3 @@ test/
 .git
 .gitignore
 gruntfile.js
-bower.json
