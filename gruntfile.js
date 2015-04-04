@@ -74,6 +74,61 @@ module.exports = function(grunt) {
       }
     },
 
+    // @task karma
+    karma: {
+      // @target unit test with global deployment
+      global: {
+        configFile: 'test/karma-conf-unit.js'
+      },
+
+      // @target unit test with AMD deployment
+      amd: {
+        configFile: 'test/karma-conf-unit.js',
+        // config file overrides
+        options: {
+          exclude: [
+            'test/support/cjs/**/*.js',
+            'test/unit/**/*Cjs*.js',
+            'test/unit/**/*Global*.js'
+          ],
+          coverageReporter: {
+            type: 'html',
+            dir: 'coverage_reports/amd'
+          }
+        }
+      },
+
+      // @target unit test with CommonJS deployment
+      cjs: {
+        configFile: 'test/karma-conf-unit.js',
+        // config file overrides
+        options: {
+          exclude: [
+            'node_modules/almond/almond.js',
+            'test/unit/**/*Amd*.js',
+            'test/unit/**/*Global*.js'
+          ],
+          coverageReporter: {
+            type: 'html',
+            dir: 'coverage_reports/cjs'
+          }
+        }
+      },
+
+      // @target run all unit tests without code coverage and browsers (for
+      //  debugging tests since code coverage mangles the source), waiting
+      //  for browser connections rather than performing just a 'single run'
+      debug: {
+        configFile: 'test/karma-conf-unit.js',
+        // config file overrides
+        options: {
+          singleRun: false,
+          browsers: [],
+          reporters: ['progress']
+        }
+      }
+    },
+
     // @task watch for changes and rebuild
     watch: {
       // @target
@@ -145,6 +200,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-jscs');
+  grunt.loadNpmTasks('grunt-karma');
 
   //
   // Register Tasks
@@ -155,9 +211,27 @@ module.exports = function(grunt) {
     'jscs:all'
   ]);
 
-  grunt.registerTask('test', 'lint, then run all tests', [
-    'lint'
-  ]);
+  // @param {String} [browserList] Comma-delimited list of browser launchers for
+  //  Karma to run tests. Default is 'PhantomJS'. See 'test/karma-conf-unit.js#browsers'
+  //  for a list of possible values.
+  grunt.registerTask('test', 'lint, then run all tests', function(browserList) {
+    var browsers = browserList ? browserList.split(',') : undefined;
+
+    if (browsers) {
+      grunt.log.writeln('[test] running Karma with browsers: ' +
+          browsers.join(', '));
+      grunt.config('karma.global.options.browsers', browsers);
+      grunt.config('karma.amd.options.browsers', browsers);
+      grunt.config('karma.cjs.options.browsers', browsers);
+    }
+
+    grunt.task.run([
+      'lint',
+      'karma:global',
+      'karma:amd',
+      'karma:cjs'
+    ]);
+  });
 
   grunt.registerTask('dist', 'test, build the distribution', [
     'clean:build',

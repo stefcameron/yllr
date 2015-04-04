@@ -11,7 +11,14 @@
   "browser": true,
   "node": false,
   "globals": {
-    "define": true, // AMD
-    "module": true // CommonJS
+    // AMD, CommonJS
+    "require": true,
+
+     // AMD
+    "define": true,
+
+    // CommonJS
+    "module": true,
+    "exports": true
   }
 }

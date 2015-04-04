@@ -1,18 +1,24 @@
 (function(global, factory) {
   'use strict';
 
+  var libName = 'yllr';
+
   if (typeof define === 'function' && define.amd) {
-    define([], factory); // AMD
-  } else if (typeof exports === 'object') {
+    define(libName, [], factory); // AMD
+  } else if (typeof module === 'object' && typeof module.exports === 'object') {
     module.exports = factory(); // CommonJS
   } else {
-    global.yllr = factory(); // Global
+    global[libName] = factory(); // Global
   }
 })(this, function() {
   'use strict';
 
+  // @type {String}
+  var DEFAULT_MESSAGE = 'runtime assertion';
+
+  // @type {Function}
   var YllrError = (function() {
-    var Super = Error;
+    var SuperConstructor = Error;
 
     /**
      * Defines the error that is throw by default when a check fails.
@@ -24,26 +30,32 @@
      *  index matching a token string found in `tokens`.
      */
     var YllrError = function(message, tokens) {
-      tokens = tokens || []; // normalize
+      SuperConstructor.call(this);
 
-      Super.call(this, message);
-
+      this.message = message;
       this.name = 'yllrError';
 
+      tokens = tokens || []; // normalize
       tokens.forEach(function(token, i) {
         this.message = this.message.replace('{' + i + '}', '' + token);
       }.bind(this));
     };
 
-    YllrError.prototype = Object.create(Super.prototype);
+    YllrError.prototype = Object.create(SuperConstructor.prototype);
     YllrError.prototype.constructor = YllrError;
 
     return YllrError;
   })();
 
-  // Type of error to throw when a check fails.
+  // Type of error to throw when a check fails. Defaults to `yllr.YllrError`.
+  // @type {Function}
   // @see #setErrorType()
   var __errorType = YllrError;
+
+  // `true` if failed checks should result in failures; `false` if checks should
+  //  be ignored.
+  // @type
+  var __checksEnabled = true;
 
   /**
    * Perform a runtime check.
@@ -57,8 +69,8 @@
    *  `message`, passed to the generated error.
    */
   var check = function(condition, message, tokens) {
-    if (!condition) {
-      throw new __errorType(message, tokens);
+    if (__checksEnabled && !condition) {
+      throw new __errorType(message || DEFAULT_MESSAGE, tokens);
     }
   };
 
@@ -78,6 +90,17 @@
   };
 
   /**
+   * Allows enabling or disabling all checks. Subsequent calls to `yllr.check`
+   *  will cause failures if enabled, or do nothing if disabled.
+   * @function yllr.config.enableChecks
+   * @param {Boolean} [enable=true] If _truthy_ (or unspecified), checks are
+   *  enabled; otherwise, checks are disabled.
+   */
+  var enableChecks = function(enable) {
+    __checksEnabled = enable === undefined || !!enable;
+  };
+
+  /**
    * The `yllr` namespace.
    * @namespace yllr
    */
@@ -85,7 +108,7 @@
     // types
     YllrError: YllrError,
 
-    // methods
+    // functions
     check: check,
 
     /**
@@ -93,7 +116,9 @@
      * @namespace yllr.config
      */
     config: {
-      setErrorType: setErrorType
+      // functions
+      setErrorType: setErrorType,
+      enableChecks: enableChecks
     }
   };
-})();
+});
