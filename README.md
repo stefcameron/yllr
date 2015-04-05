@@ -1,8 +1,8 @@
 # yllr
 
-[![Build Status](https://travis-ci.org/stefcameron/yllr.svg?branch=master)](https://travis-ci.org/stefcameron/yllr) [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
+[![Build Status](https://travis-ci.org/stefcameron/yllr.svg?branch=master)](https://travis-ci.org/stefcameron/yllr)
 
-[![NPM](https://nodei.co/npm/yllr.png?downloads=true&stars=true)](https://nodei.co/npm/yllr/)
+[![NPM](https://nodei.co/npm/yllr.png?compact=true)](https://nodei.co/npm/yllr/)
 
 Minimal runtime assertion library.
 
