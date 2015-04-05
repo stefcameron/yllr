@@ -1,5 +1,8 @@
+bower_components/
 build/
+coverage_reports/
 jscs_plugins/
+node_modules/
 src/
 sublime/
 test/
