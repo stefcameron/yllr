@@ -1,5 +1,7 @@
 # yllr
 
+[![Build Status](https://travis-ci.org/stefcameron/yllr.svg?branch=master)](https://travis-ci.org/stefcameron/yllr) [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
+
 Minimal runtime assertion library.
 
 ## Goal
@@ -84,5 +86,4 @@ By default, checks are enabled, which means any `yllr.check()` call with a _fals
 
 *   publish to NPM
 *   publish to Bower
-*   integrate with Travis
 *   generate JSDocs as part of build -- generate in `/dist` but exclude from NPM and Bower? Would git load the HTML somehow, or can JSDoc produce Markdown-based output?
