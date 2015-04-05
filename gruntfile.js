@@ -6,6 +6,10 @@ module.exports = function(grunt) {
   var processChangedScripts; // @type {Function}
   var changedScriptFileMap = {}; // @type {Object<String, String>}
 
+  // force line endings to LF on all operating systems (otherwise, defaults to
+  //  CRLF on Windows)
+  grunt.util.linefeed = '\n';
+
   // metadata/task configuration
   grunt.initConfig({
     //
@@ -233,16 +237,20 @@ module.exports = function(grunt) {
     ]);
   });
 
-  grunt.registerTask('dist', 'test, build the distribution', [
+  grunt.registerTask('dist', 'build the distribution', [
     'clean:build',
     'clean:dist',
-    'test',
     'concat:dist',
     'uglify:dist'
   ]);
 
+  grunt.registerTask('all', 'test and build', [
+    'test',
+    'dist'
+  ]);
+
   // default task
-  grunt.registerTask('default', ['dist']);
+  grunt.registerTask('default', ['all']);
 
   //
   // Register Events

@@ -4,7 +4,7 @@
   "description": "minimal runtime assertion library",
   "main": "dist/yllr.js",
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test dist"
   },
   "repository": {
     "type": "git",
