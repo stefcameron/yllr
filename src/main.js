@@ -13,8 +13,13 @@
 })(this, function() {
   'use strict';
 
+  // Default message to display if one isn't provided for a `check()`.
   // @type {String}
   var DEFAULT_MESSAGE = 'runtime assertion';
+
+  // Representation of an empty string passed as a token in `check()`.
+  // @type {String}
+  var TYPE_EMPTY = '<empty>';
 
   // @type {Function}
   var YllrError = (function() {
@@ -37,7 +42,8 @@
 
       tokens = tokens || []; // normalize
       tokens.forEach(function(token, i) {
-        this.message = this.message.replace('{' + i + '}', '' + token);
+        this.message = this.message.replace('{' + i + '}', '' +
+            (token === '' ? TYPE_EMPTY : token));
       }.bind(this));
     };
 

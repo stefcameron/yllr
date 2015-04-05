@@ -62,6 +62,11 @@ describe('yllr (global):', function() {
           // bad token list type
           expect(function() { new YllrError(template, {}); }).toThrow();
         });
+
+        it('should replace empty string tokens with special string', function() {
+          var err = new YllrError('{0}', ['']);
+          expect(err.message).toEqual('<empty>');
+        });
       }); // YllrError
     }); // types
 

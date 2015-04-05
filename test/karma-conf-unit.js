@@ -79,7 +79,7 @@ module.exports = function(config) {
     // - PhantomJS (included with Karma)
     // - Firefox
     // - Opera
-    // - Safari (only Mac)
+    // - Safari
     // - IE (only Windows)
     browsers: ['PhantomJS'],
 
