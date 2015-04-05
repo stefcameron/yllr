@@ -86,5 +86,4 @@ By default, checks are enabled, which means any `yllr.check()` call with a _fals
 
 ## TODO
 
-*   publish to Bower
 *   generate JSDocs as part of build -- generate in `/dist` but exclude from NPM and Bower? Would git load the HTML somehow, or can JSDoc produce Markdown-based output?
