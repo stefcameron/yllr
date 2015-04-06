@@ -24,6 +24,12 @@ module.exports = function(grunt) {
         ' * @license <%= pkg.licenses[0].type %>, <%= pkg.licenses[0].url %>\n' +
         ' */',
 
+    docsBanner:
+        '# API Documentation\n' +
+        'Version <%= pkg.version %>\n',
+
+    docsFile: '<%= pkg.name %>-docs.md',
+
     dir: {
       build: 'build', // tmp build files
       dist: 'dist' // release directory
@@ -145,12 +151,14 @@ module.exports = function(grunt) {
 
         files: [
           'src/**/*.js',
+          'src/**/*.jsdoc',
           'test/**/*.js'
         ],
 
         tasks: [
           'jshint:changed',
-          'jscs:changed'
+          'jscs:changed',
+          'docs'
         ]
       }
     },
@@ -158,7 +166,11 @@ module.exports = function(grunt) {
     // @task clean files
     clean: {
       build: ['<%= dir.build %>'],
-      dist: ['<%= dir.dist %>']
+      dist: ['<%= dir.dist %>'],
+      docs: [
+        '<%= dir.build %>/*.md',
+        '<%= dir.dist %>/*.md'
+      ]
     },
 
     // @task concat/copy files
@@ -170,6 +182,15 @@ module.exports = function(grunt) {
         },
         src: ['src/main.js'],
         dest: '<%= dir.dist %>/<%= pkg.name %>.js'
+      },
+
+      // @target
+      docs: {
+        options: {
+          banner: '<%= docsBanner + "\\n" %>'
+        },
+        src: ['<%= dir.build %>/<%= docsFile %>'],
+        dest: '<%= dir.dist %>/<%= docsFile %>'
       }
     },
 
@@ -194,6 +215,20 @@ module.exports = function(grunt) {
         src: ['<%= dir.dist %>/<%= pkg.name %>.js'],
         dest: '<%= dir.dist %>/<%= pkg.name %>.min.js'
       }
+    },
+
+    // @task generate markdown API documentation
+    jsdoc2md: {
+      options: {
+        'private': false, // exclude @private content
+        'heading-depth': 1
+      },
+
+      // @target
+      dist: {
+        src: ['src/**/*.js', 'src/**/*.jsdoc'],
+        dest: '<%= dir.build %>/<%= docsFile %>'
+      }
     }
   });
 
@@ -204,6 +239,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-jscs');
+  grunt.loadNpmTasks('grunt-jsdoc-to-markdown');
   grunt.loadNpmTasks('grunt-karma');
 
   //
@@ -213,6 +249,12 @@ module.exports = function(grunt) {
   grunt.registerTask('lint', 'lint all code', [
     'jshint:all',
     'jscs:all'
+  ]);
+
+  grunt.registerTask('docs', 'build documentation', [
+    'clean:docs',
+    'jsdoc2md:dist',
+    'concat:docs'
   ]);
 
   // @param {String} [browserList] Comma-delimited list of browser launchers for
@@ -237,11 +279,12 @@ module.exports = function(grunt) {
     ]);
   });
 
-  grunt.registerTask('dist', 'build the distribution', [
+  grunt.registerTask('dist', 'build distribution', [
     'clean:build',
     'clean:dist',
     'concat:dist',
-    'uglify:dist'
+    'uglify:dist',
+    'docs'
   ]);
 
   grunt.registerTask('all', 'test and build', [

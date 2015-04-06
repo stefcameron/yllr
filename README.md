@@ -84,6 +84,10 @@ By default, checks are enabled, which means any `yllr.check()` call with a _fals
     yllr.config.enableChecks(false); // disable checks
     yllr.config.enableChecks(); // enable checks
 
+## Documentation
+
+Refer to the generated [API Documentation](dist/yllr-docs.md).
+
 ## TODO
 
-*   generate JSDocs as part of build -- generate in `/dist` but exclude from NPM and Bower? Would git load the HTML somehow, or can JSDoc produce Markdown-based output?
+*   Waiting for [grunt-jsdoc-to-markdown](https://github.com/jsdoc2md/grunt-jsdoc-to-markdown) to include a newer version of [jsdoc-to-markdown](https://github.com/jsdoc2md/jsdoc-to-markdown) which will hopefully generate even more complete API documentation (some tags, like `@see`, aren't being used at the moment).

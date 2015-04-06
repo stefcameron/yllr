@@ -26,7 +26,9 @@
     var SuperConstructor = Error;
 
     /**
-     * Defines the error that is throw by default when a check fails.
+     * [[extends: `JavaScript.Error`]]
+     * Defines the error that is thrown by default when a check fails.
+     *  `error.name` is set to `yllrError`.
      * @class yllr.YllrError
      * @param {String} message The error message.
      * @param {Array.<String>} [tokens] Optional tokens to substitute into the
@@ -107,7 +109,7 @@
   };
 
   /**
-   * The `yllr` namespace.
+   * The `yllr` library.
    * @namespace yllr
    */
   return {
@@ -118,7 +120,7 @@
     check: check,
 
     /**
-     * The `yllr.config` namespace.
+     * Configuration options.
      * @namespace yllr.config
      */
     config: {
