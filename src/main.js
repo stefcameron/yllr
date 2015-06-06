@@ -73,11 +73,35 @@
    *  thrown with the specified message.
    * @param {String} [message] Optional message. A generic message is used if
    *  one is not provided.
-   * @param {Array.<String>} [tokens] Optional substitution tokens for the
-   *  `message`, passed to the generated error.
+   * @param {...String} [tokens] Optional substitution tokens for the
+   *  `message`, passed to the generated error. This can be specified either as
+   *  a _single_ `Array.<String>` parameter (in which case each element is considered
+   *  to be a token), or as multiple parameters (in which case arrays are treated
+   *  as tokens, not their elements).
+   *
+   *  When using the single array parameter, an array can be passed as a single
+   *   token by wrapping it in the token array: `[[1, 2, 3], 'a']` would result
+   *   in two tokens, the first being an `Array.<Number>` and the second being
+   *   a `String`. This is the exception if you need to pass one token and it
+   *   happens to be an array.
    */
-  var check = function(condition, message, tokens) {
+  var check = function(condition, message) {
+    var params; // Array.<Object>
+    var tokens; // Array.<Object> (should be strings)
+
     if (__checksEnabled && !condition) {
+      params = [].slice.call(arguments);
+      if (params.length === 3) {
+        if (Object.prototype.toString.call(params[2]) === '[object Array]') {
+          tokens = params[2]; // token array specified
+        } else {
+          tokens = [params[2]]; // some other type: consider it a token
+        }
+      } else if (params.length > 3) {
+        // list of tokens
+        tokens = params.slice(2);
+      }
+
       throw new __errorType(message || DEFAULT_MESSAGE, tokens);
     }
   };
@@ -88,7 +112,7 @@
    * @param {Function} [errorType] If specified, expected to be a constructor
    *  function which has the same signature as the default `YllrError`. If
    *  falsy, resets the error type to `YllrError`.
-   * @see yllr.YllrError
+   * @see {@link yllr.YllrError `yllr.YllrError`}
    */
   var setErrorType = function(errorType) {
     check(!errorType || typeof errorType === 'function',
@@ -103,9 +127,20 @@
    * @function yllr.config.enableChecks
    * @param {Boolean} [enable=true] If _truthy_ (or unspecified), checks are
    *  enabled; otherwise, checks are disabled.
+   * @see {@link yllr.config.checksEnabled `yllr.config.checksEnabled()`}
    */
   var enableChecks = function(enable) {
     __checksEnabled = enable === undefined || !!enable;
+  };
+
+  /**
+   * Determines if all checks are enabled; a compliment to `config.enableChecks()`.
+   * @function yllr.config.checksEnabled
+   * @returns {Boolean} `true` if all checks are enabled; `false` otherwise.
+   * @see {@link yllr.config.enableChecks `yllr.config.enableChecks()`}
+   */
+  var checksEnabled = function() {
+    return __checksEnabled;
   };
 
   /**
@@ -126,7 +161,8 @@
     config: {
       // functions
       setErrorType: setErrorType,
-      enableChecks: enableChecks
+      enableChecks: enableChecks,
+      checksEnabled: checksEnabled
     }
   };
 });

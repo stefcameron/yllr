@@ -1,6 +1,6 @@
 {
   "name": "yllr",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "minimal runtime assertion library",
   "main": "dist/yllr.js",
   "scripts": {
@@ -45,7 +45,7 @@
     "grunt-contrib-uglify": "^0.8.0",
     "grunt-contrib-watch": "^0.6.1",
     "grunt-jscs": "^1.5.0",
-    "grunt-jsdoc-to-markdown": "^0.4.3",
+    "grunt-jsdoc-to-markdown": "^1.1.1",
     "grunt-karma": "^0.10.1",
     "jasmine-core": "^2.2.0",
     "karma": "^0.12.31",

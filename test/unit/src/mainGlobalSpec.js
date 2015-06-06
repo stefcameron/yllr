@@ -96,6 +96,26 @@ describe('yllr (global):', function() {
           expect(function() { yllr.check(false, 'must be {0}', ['true']); })
               .toThrow(new YllrError('must be true'));
         });
+
+        it('should allow non-array token in check message', function() {
+          expect(function() { yllr.check(false, 'must be {0}', true); })
+              .toThrow(new YllrError('must be true'));
+        });
+
+        it('should use rest params as tokens in check message', function() {
+          expect(function() { yllr.check(false, '{0} {1} {2}', 'must', 'be', true); })
+              .toThrow(new YllrError('must be true'));
+        });
+
+        it('should allow arrays in multiple token rest params', function() {
+          expect(function() { yllr.check(false, 'must be {0}: {1}', 'in', [1, 2]); })
+              .toThrow(new YllrError('must be in: 1,2'));
+        });
+
+        it('should allow arrays in single tokens rest param', function() {
+          expect(function() { yllr.check(false, 'must be in: {0}', [[1, 2]]); })
+              .toThrow(new YllrError('must be in: 1,2'));
+        });
       }); // check()
     }); // functions
   }); // library
@@ -243,6 +263,24 @@ describe('yllr (global):', function() {
           expect(function() { yllr.check(false); }).toThrow();
         });
       }); // enableChecks()
+
+      describe('checksEnabled():', function() {
+        afterEach(function() {
+          // reset what any spec may have done
+          yllr.config.enableChecks();
+        });
+
+        it('should be included', function() {
+          expect(_.isFunction(yllr.config.checksEnabled)).toEqual(true);
+        });
+
+        it('should report whether checks are enabled', function() {
+          expect(yllr.config.checksEnabled()).toEqual(true);
+
+          yllr.config.enableChecks(false);
+          expect(yllr.config.checksEnabled()).toEqual(false);
+        });
+      }); // checksEnabled()
     }); // functions
   }); // config
 });

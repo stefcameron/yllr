@@ -8,7 +8,7 @@ Minimal runtime assertion library.
 
 ## Goal
 
-This library aims to be __small__. The current release is just 904 bytes in its minified form. It has just enough functionality (i.e. _syntactic sugar_) to make it easy to add and manage runtime assertions in your code base.
+This library aims to be __small__. The current release comes in around 1KB in its minified form. It has just enough functionality (i.e. _syntactic sugar_) to make it easy to add and manage runtime assertions in your code base.
 
 The goal is not to replace static code analysis provided by transpilers such as [TypeScript](http://www.typescriptlang.org/). Rather, it's to make it easy to help developers properly use a library you're built. If an API calls for a number as a parameter and you don't want to write extra code to make it work with anything else that might get thrown at it, this little library is for you!
 
@@ -30,7 +30,7 @@ Many existing assertion libraries provide extra specialized assertion functions 
 
 Those specialized functions would unnecessarily bloat this library since a project usually already has an existing, consistent way of checking a condition.
 
-With that in mind, instead of having code like this throughout your code base:
+With that in mind, instead of having code like this throughout your code base...
 
     function add(left, right) {
         if (typeof left !== 'number') {
@@ -44,9 +44,9 @@ With that in mind, instead of having code like this throughout your code base:
         return left + right;
     };
 
-Note, in the code above, if `left` were an empty string, the resulting `error.message` would be `'left must be a number: '` -- not very helpful...
+(note, in the code above, if `left` were an empty string, the resulting `error.message` would be `'left must be a number: '` -- not very helpful!)
 
-You can now use `yllr.check()` and just have nice (which looks much nicer, IMO):
+...you can now use `yllr.check()`, which looks much nicer and is easily identified as an assertion (and allows to you instantly turn them all on/off with [`yllr.config.enableChecks()`](#enable-checks)):
 
     function add(left, right) {
         yllr.check(typeof left === 'number', 'left must be a number: {0}', [left]);
@@ -88,6 +88,18 @@ By default, checks are enabled, which means any `yllr.check()` call with a _fals
 
 Refer to the generated [API Documentation](dist/yllr-docs.md).
 
-## TODO
+## History
 
-*   Waiting for [grunt-jsdoc-to-markdown](https://github.com/jsdoc2md/grunt-jsdoc-to-markdown) to include a newer version of [jsdoc-to-markdown](https://github.com/jsdoc2md/jsdoc-to-markdown) which will hopefully generate even more complete API documentation (some tags, like `@see`, aren't being used at the moment).
+### 0.0.3
+
+*   Added `yllr.config.checksEnabled()` to compliment `yllr.config.enableChecks()`.
+*   Added support for the rest parameter of `yllr.check()` as alternate substitution tokens (to using an array with tokens). This makes the function more similar to some common string formatting methods in NodeJS (e.g. `debug('foo %s', 'bar'); // foo bar` using the handy [debug](https://github.com/visionmedia/debug) library).
+*   Updated [grunt-jsdoc-to-markdown](https://github.com/jsdoc2md/grunt-jsdoc-to-markdown) dependency which uses the latest (1.1.1 at this time) [jsdoc-to-markdown](https://github.com/jsdoc2md/jsdoc-to-markdown) library. This adds support for the `@see` tag which is useful.
+
+### 0.0.2
+
+Added [API Documentation](dist/yllr-docs.md).
+
+### 0.0.1
+
+Initial release.
