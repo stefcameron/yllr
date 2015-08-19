@@ -1,5 +1,5 @@
 # API Documentation
-Version 0.0.3
+Version 0.0.4
 
 <a name="yllr"></a>
 # yllr : <code>object</code>
@@ -77,10 +77,11 @@ Determines if all checks are enabled; a compliment to `config.enableChecks()`.
 Perform a runtime check.
 
 **Kind**: static method of <code>[yllr](#yllr)</code>  
+**See**: [`yllr.config.enableChecks`](#yllr.config.enableChecks)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | <code>\*</code> | Condition to check. If _truthy_, the check passes and  nothing happens. If _falsy_, the check fails, causing a new error to be  thrown with the specified message. |
+| condition | <code>\*</code> | Condition to check. If _truthy_, the check passes and  nothing happens. If _falsy_, the check fails, causing a new error to be  thrown with the specified message.  If the `condition` is a function, it's expected to be one which returns  a _truthy_ or _falsy_ value. Using a function ensures that the condition  evaluation code is truly only executed IIF checks are enabled. |
 | [message] | <code>String</code> | Optional message. A generic message is used if  one is not provided. |
 | [...tokens] | <code>String</code> | Optional substitution tokens for the  `message`, passed to the generated error. This can be specified either as  a _single_ `Array.<String>` parameter (in which case each element is considered  to be a token), or as multiple parameters (in which case arrays are treated  as tokens, not their elements).  When using the single array parameter, an array can be passed as a single   token by wrapping it in the token array: `[[1, 2, 3], 'a']` would result   in two tokens, the first being an `Array.<Number>` and the second being   a `String`. This is the exception if you need to pass one token and it   happens to be an array. |
 

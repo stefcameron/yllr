@@ -71,6 +71,11 @@
    * @param {*} condition Condition to check. If _truthy_, the check passes and
    *  nothing happens. If _falsy_, the check fails, causing a new error to be
    *  thrown with the specified message.
+   *
+   *  If the `condition` is a function, it's expected to be one which returns
+   *  a _truthy_ or _falsy_ value. Using a function ensures that the condition
+   *  evaluation code is truly only executed IIF checks are enabled.
+   *
    * @param {String} [message] Optional message. A generic message is used if
    *  one is not provided.
    * @param {...String} [tokens] Optional substitution tokens for the
@@ -84,25 +89,31 @@
    *   in two tokens, the first being an `Array.<Number>` and the second being
    *   a `String`. This is the exception if you need to pass one token and it
    *   happens to be an array.
+   *
+   * @see {@link yllr.config.enableChecks `yllr.config.enableChecks`}
    */
   var check = function(condition, message) {
     var params; // Array.<Object>
     var tokens; // Array.<Object> (should be strings)
+    var result;
 
-    if (__checksEnabled && !condition) {
-      params = [].slice.call(arguments);
-      if (params.length === 3) {
-        if (Object.prototype.toString.call(params[2]) === '[object Array]') {
-          tokens = params[2]; // token array specified
-        } else {
-          tokens = [params[2]]; // some other type: consider it a token
+    if (__checksEnabled) {
+      result = (typeof condition === 'function') ? condition() : condition;
+      if (!result) {
+        params = [].slice.call(arguments);
+        if (params.length === 3) {
+          if (Object.prototype.toString.call(params[2]) === '[object Array]') {
+            tokens = params[2]; // token array specified
+          } else {
+            tokens = [params[2]]; // some other type: consider it a token
+          }
+        } else if (params.length > 3) {
+          // list of tokens
+          tokens = params.slice(2);
         }
-      } else if (params.length > 3) {
-        // list of tokens
-        tokens = params.slice(2);
-      }
 
-      throw new __errorType(message || DEFAULT_MESSAGE, tokens);
+        throw new __errorType(message || DEFAULT_MESSAGE, tokens);
+      }
     }
   };
 

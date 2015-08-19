@@ -80,6 +80,19 @@ describe('yllr (global):', function() {
 
         it('should not throw if condition is met', function() {
           expect(function() { yllr.check(true); }).not.toThrow();
+          expect(function() { yllr.check('a'); }).not.toThrow();
+          expect(function() { yllr.check(1); }).not.toThrow();
+          expect(function() { yllr.check({}); }).not.toThrow();
+          expect(function() { yllr.check([]); }).not.toThrow();
+          expect(function() { yllr.check(/foo/); }).not.toThrow();
+        });
+
+        it('should throw if condition is not met', function() {
+          expect(function() { yllr.check(false); }).toThrow();
+          expect(function() { yllr.check(''); }).toThrow();
+          expect(function() { yllr.check(0); }).toThrow();
+          expect(function() { yllr.check(undefined); }).toThrow();
+          expect(function() { yllr.check(null); }).toThrow();
         });
 
         it('should throw a YllrError with default message', function() {
@@ -115,6 +128,19 @@ describe('yllr (global):', function() {
         it('should allow arrays in single tokens rest param', function() {
           expect(function() { yllr.check(false, 'must be in: {0}', [[1, 2]]); })
               .toThrow(new YllrError('must be in: 1,2'));
+        });
+
+        it('should call condition function', function() {
+          var result;
+          var condition = function() {
+            return result;
+          };
+
+          result = true;
+          expect(function() { yllr.check(condition()); }).not.toThrow();
+
+          result = false;
+          expect(function() { yllr.check(condition()); }).toThrow();
         });
       }); // check()
     }); // functions
@@ -261,6 +287,22 @@ describe('yllr (global):', function() {
         it('should allow check assertions by default', function() {
           yllr.config.enableChecks();
           expect(function() { yllr.check(false); }).toThrow();
+        });
+
+        it('should not call condition function when checks disabled', function() {
+          var called = false;
+          var condition = function() {
+            called = true;
+            return true; // pass check
+          };
+
+          yllr.config.enableChecks(false);
+          yllr.check(condition);
+          expect(called).toEqual(false);
+
+          yllr.config.enableChecks(true);
+          yllr.check(condition);
+          expect(called).toEqual(true);
         });
       }); // enableChecks()
 

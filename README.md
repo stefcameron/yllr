@@ -63,6 +63,8 @@ Note now with the _token_ feature, if `left` were an empty string, the resulting
 *   `false.toString() === 'false'`
 *   `true.toString() === 'true'`
 
+Finally, the `condition` parameter can optionally be a function that returns a _truthy_ or _falsy_ value. By using a function, it ensures that any potentially expensive condition evaluation code is only executed if `yllr` checks are enabled (see [API docs](dist/yllr-docs.md) on enabling/disabling checks).
+
 ## Configuration
 
 ### Assertion Type
@@ -89,6 +91,10 @@ By default, checks are enabled, which means any `yllr.check()` call with a _fals
 Refer to the generated [API Documentation](dist/yllr-docs.md).
 
 ## History
+
+### 0.0.4
+
+*   `yllr.check()`'s `condition` parameter can now optionally be a function which evaluates to the condition result. This ensures that condition checking code is only executed IIF checks are enabled.
 
 ### 0.0.3
 
