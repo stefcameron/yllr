@@ -8,9 +8,9 @@ Minimal runtime assertion library.
 
 ## Goal
 
-This library aims to be __small__. The current release comes in around 1KB in its minified form. It has just enough functionality (i.e. _syntactic sugar_) to make it easy to add and manage runtime assertions in your code base.
+This library aims to be __small__. The current release comes in around 1.6KB in its minified form. It has just enough functionality (i.e. _syntactic sugar_) to make it easy to add and manage runtime assertions in your code base.
 
-The goal is not to replace static code analysis provided by transpilers such as [TypeScript](http://www.typescriptlang.org/). Rather, it's to make it easy to help developers properly use a library you're built. If an API calls for a number as a parameter and you don't want to write extra code to make it work with anything else that might get thrown at it, this little library is for you!
+The goal is not to replace static code analysis provided by transpilers such as [TypeScript](http://www.typescriptlang.org/). Rather, it's to make it easy to help developers properly use a library you've built. If an API calls for a number as a parameter and you don't want to write extra code to make it work with anything else that might get thrown at it, this little library is for you!
 
 ## Installation
 
@@ -65,6 +65,16 @@ Note now with the _token_ feature, if `left` were an empty string, the resulting
 
 Finally, the `condition` parameter can optionally be a function that returns a _truthy_ or _falsy_ value. By using a function, it ensures that any potentially expensive condition evaluation code is only executed if `yllr` checks are enabled (see [API docs](dist/yllr-docs.md) on enabling/disabling checks).
 
+### Contextual Checks
+
+The `yllr.make(context)` creates a _contextual_ `yllr` object which has the same interface as the global `yllr` object (exception for `yllr.config` and `yllr.make`), the difference being that errors thrown from this object's `check()` method get an additional context string when they're created. The `yllr.YllrError` object has a `context` property that is set to this value, and the constructor of any custom error type will also get this context as a parameter.
+
+The main advantage of a contextual `yllr` object's `check()` method over the generic `yllr.check()` is the context. Each browser deals with uncaught errors and logged errors in different ways, and error stacks, especially resulting from an asynchronous call (e.g. promise resolutions) are often meaningless. This simple context string, if set judiciously, can greatly simplify debugging by providing a crucial hint about the source of the failed check.
+
+When converting a `yllr.YllrError` instance to a string, the output looks like this:
+*    With context: `YllrError: <context>: <message>`
+*    Without context: `YllrError: <message>`
+
 ## Configuration
 
 ### Assertion Type
@@ -91,6 +101,13 @@ By default, checks are enabled, which means any `yllr.check()` call with a _fals
 Refer to the generated [API Documentation](dist/yllr-docs.md).
 
 ## History
+
+### 0.0.5
+
+*    New `yllr.make(context)` makes new contextual `yllr` objects.
+*    New `yllr.config.noConflict()` method.
+*    Updated default error name to be `'YllrError'` instead of `'yllrError'`, which is more in line with standard JavaScript error names like `'Error'`, `'TypeError'`, `'SyntaxError'`, etc.
+*    Updated all package dependencies.
 
 ### 0.0.4
 

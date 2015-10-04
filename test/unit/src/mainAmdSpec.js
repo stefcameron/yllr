@@ -26,6 +26,13 @@ describe('yllr (AMD):', function() {
       asyncDone();
     });
   });
+
+  it('should not include ' + moduleName + '.config.noConflict()', function(asyncDone) {
+    require([moduleName], function(yllr) { // load module
+      expect(yllr.config.noConflict).toEqual(undefined);
+      asyncDone();
+    });
+  });
 });
 
 })(this);

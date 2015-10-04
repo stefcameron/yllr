@@ -30,6 +30,12 @@ describe('yllr (AMD):', function() {
     expect(_.isPlainObject(yllr)).toEqual(true);
     expect(_.isFunction(yllr.YllrError)).toEqual(true);
   });
+
+  it('should not include yllr.config.noConflict()', function() {
+    var yllr = global.module.exports;
+
+    expect(yllr.config.noConflict).toEqual(undefined);
+  });
 });
 
 })(this);

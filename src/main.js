@@ -8,7 +8,32 @@
   } else if (typeof module === 'object' && typeof module.exports === 'object') {
     module.exports = factory(); // CommonJS
   } else {
-    global[libName] = factory(); // Global
+    // Global
+    (function(prevValue) {
+      var lib = factory();
+
+      global[libName] = lib;
+
+      /**
+       * Restores the previous value of `global.yllr` (i.e. `window.yllr`) and
+       *  returns a reference to the `yllr` library.
+       *
+       * This configuration function only exists if the library was registered
+       *  into the global namespace. It will not exist if it was registered as
+       *  an AMD or CommonJS module.
+       *
+       * Once this function is called, it will be removed (i.e. it can only be
+       *  called once).
+       *
+       * @function yllr.config.noConflict
+       * @returns {yllr} Reference to the `yllr` library.
+       */
+      lib.config.noConflict = function() {
+        global[libName] = prevValue; // restore previous value (even if `undefined`)
+        lib.config.noConflict = undefined; // remove this function
+        return lib; // return the library
+      };
+    })(global[libName]);
   }
 })(this, function() {
   'use strict';
@@ -23,24 +48,47 @@
 
   // @type {Function}
   var YllrError = (function() {
-    var SuperConstructor = Error;
+    var SuperCtr = Error;
 
     /**
      * [[extends: `JavaScript.Error`]]
      * Defines the error that is thrown by default when a check fails.
-     *  `error.name` is set to `yllrError`.
+     *  `error.name` is set to `YllrError`.
      * @class yllr.YllrError
      * @param {String} message The error message.
      * @param {Array.<String>} [tokens] Optional tokens to substitute into the
      *  `message` specified. If tokens are provided, `message` is expected to
      *  contain substitution tokens using the `{n}` syntax where `n` is a zero-based
      *  index matching a token string found in `tokens`.
+     * @param {String} [context] Optional context string to associate with the error.
+     *  A _falsy_ value will be considered `undefined` (no context). If this error
+     *  is being instantiated from a _contextual yllr object_, this parameter
+     *  will be the associated context.
+     * @see {@link yllr.make `yllr.make`}
      */
-    var YllrError = function(message, tokens) {
-      SuperConstructor.call(this);
+    var YllrError = function(message, tokens, context) {
+      SuperCtr.call(this);
 
+      /**
+       * Error message.
+       * @name yllr.YllrError#message
+       * @type {String}
+       */
       this.message = message;
-      this.name = 'yllrError';
+
+      /**
+       * Error name/code.
+       * @name yllr.YllrError#name
+       * @type {String}
+       */
+      this.name = 'YllrError';
+
+      /**
+       * Error context, if specified; `undefined` otherwise.
+       * @name yllr.YllrError#context
+       * @type {(String|undefined)}
+       */
+      this.context = context || undefined;
 
       tokens = tokens || []; // normalize
       tokens.forEach(function(token, i) {
@@ -49,8 +97,20 @@
       }.bind(this));
     };
 
-    YllrError.prototype = Object.create(SuperConstructor.prototype);
+    YllrError.prototype = Object.create(SuperCtr.prototype);
     YllrError.prototype.constructor = YllrError;
+
+    /**
+     * [[overrides: `JavaScript.Error.toString()`]]
+     * Generates a string representation of this error.
+     * @method yllr.YllrError#toString
+     * @returns {String} A string representation of this error.
+     */
+    YllrError.prototype.toString = function() {
+      // use a format similar to Error.toString()
+      return this.name + ': ' + (this.context ? (this.context + ': ') : '') +
+          this.message;
+    };
 
     return YllrError;
   })();
@@ -58,15 +118,44 @@
   // Type of error to throw when a check fails. Defaults to `yllr.YllrError`.
   // @type {Function}
   // @see #setErrorType()
-  var __errorType = YllrError;
+  var __ErrorType = YllrError;
 
   // `true` if failed checks should result in failures; `false` if checks should
   //  be ignored.
   // @type
   var __checksEnabled = true;
 
+  // Internal check function.
+  // @param {String} context Context to associate with the thrown error. Can be
+  //  omitted with a falsy value.
+  // @see yllr.check
+  var __check = function(context, condition, message) {
+    var params; // {Array.<Object>}
+    var tokens; // {Array.<Object>} (should be strings)
+    var result; // {*} truthy/falsy value
+
+    if (__checksEnabled) {
+      result = (typeof condition === 'function') ? condition() : condition;
+      if (!result) {
+        params = [].slice.call(arguments);
+        if (params.length === 4) {
+          if (Object.prototype.toString.call(params[3]) === '[object Array]') {
+            tokens = params[3]; // token array specified
+          } else {
+            tokens = [params[3]]; // some other type: consider it a token
+          }
+        } else if (params.length > 4) {
+          // list of tokens
+          tokens = params.slice(3);
+        }
+
+        throw new __ErrorType(message || DEFAULT_MESSAGE, tokens, context);
+      }
+    }
+  };
+
   /**
-   * Perform a runtime check.
+   * Check a condition.
    * @function yllr.check
    * @param {*} condition Condition to check. If _truthy_, the check passes and
    *  nothing happens. If _falsy_, the check fails, causing a new error to be
@@ -90,46 +179,63 @@
    *   a `String`. This is the exception if you need to pass one token and it
    *   happens to be an array.
    *
+   * @see {@link yllr.make `yllr.make`}
    * @see {@link yllr.config.enableChecks `yllr.config.enableChecks`}
    */
   var check = function(condition, message) {
-    var params; // Array.<Object>
-    var tokens; // Array.<Object> (should be strings)
-    var result;
+    // invoke internal `__check()` without a context
+    __check.apply(this, [undefined].concat(Array.prototype.slice.call(arguments)));
+  };
 
-    if (__checksEnabled) {
-      result = (typeof condition === 'function') ? condition() : condition;
-      if (!result) {
-        params = [].slice.call(arguments);
-        if (params.length === 3) {
-          if (Object.prototype.toString.call(params[2]) === '[object Array]') {
-            tokens = params[2]; // token array specified
-          } else {
-            tokens = [params[2]]; // some other type: consider it a token
-          }
-        } else if (params.length > 3) {
-          // list of tokens
-          tokens = params.slice(2);
-        }
+  /**
+   * Make a new contextual `yllr` object. The `context` is passed to the
+   *  {@link yllr.config.setErrorType error type} constructor when a check fails.
+   * @function yllr.make
+   * @param {String} context Associated context. Cannot be empty.
+   */
+  var make = function(context) {
+    var proto;
 
-        throw new __errorType(message || DEFAULT_MESSAGE, tokens);
+    check(context && typeof context === 'string',
+        'context: must be non-empty string');
+
+    /**
+     * Contextual yllr object. It has the same interface as the library's main
+     *  functions (with the exception of {@link yllr.make `yllr.make`}), with the
+     *  addition of an associated context to help with debugging (for instance,
+     *  to easily identify the source of the failure).
+     * @class yllr.Yllr
+     */
+    proto = {
+      /**
+       * Perform a contextual condition check.
+       * @method yllr.Yllr#check
+       * @param {*} condition Condition to check.
+       * @param {String} [message] Optional message.
+       * @see {@link yllr.check `yllr.check`}
+       */
+      check: function(condition, message) {
+        // invoke internal `__check()` with the context
+        __check.apply(this, [context].concat(Array.prototype.slice.call(arguments)));
       }
-    }
+    };
+
+    return Object.create(proto);
   };
 
   /**
    * Customizes the type of error thrown when a `check` fails.
    * @function yllr.config.setErrorType
-   * @param {Function} [errorType] If specified, expected to be a constructor
+   * @param {Function} [ErrorType] If specified, expected to be a constructor
    *  function which has the same signature as the default `YllrError`. If
    *  falsy, resets the error type to `YllrError`.
    * @see {@link yllr.YllrError `yllr.YllrError`}
    */
-  var setErrorType = function(errorType) {
-    check(!errorType || typeof errorType === 'function',
-        'errorType must be falsy or a function');
+  var setErrorType = function(ErrorType) {
+    check(!ErrorType || typeof ErrorType === 'function',
+        'ErrorType: must be falsy or function');
 
-    __errorType = !!errorType ? errorType : YllrError;
+    __ErrorType = !!ErrorType ? ErrorType : YllrError;
   };
 
   /**
@@ -164,6 +270,7 @@
 
     // functions
     check: check,
+    make: make,
 
     /**
      * Configuration options.
@@ -173,7 +280,10 @@
       // functions
       setErrorType: setErrorType,
       enableChecks: enableChecks,
-      checksEnabled: checksEnabled
+      checksEnabled: checksEnabled,
+
+      // NOTE: noConflict is set by the UMD only when registering as a global
+      noConflict: undefined
     }
   };
 });
