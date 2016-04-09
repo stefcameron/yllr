@@ -8,7 +8,7 @@ Minimal runtime assertion library.
 
 ## Goal
 
-This library aims to be __small__. The current release comes in around 1.6KB in its minified form. It has just enough functionality (i.e. _syntactic sugar_) to make it easy to add and manage runtime assertions in your code base.
+This library aims to be __small__. The current release comes in around 1.75KB in its minified form. It has just enough functionality (i.e. _syntactic sugar_) to make it easy to add and manage runtime assertions in your code base.
 
 The goal is not to replace static code analysis provided by transpilers such as [TypeScript](http://www.typescriptlang.org/). Rather, it's to make it easy to help developers properly use a library you've built. If an API calls for a number as a parameter and you don't want to write extra code to make it work with anything else that might get thrown at it, this little library is for you!
 
@@ -32,28 +32,32 @@ Those specialized functions would unnecessarily bloat this library since a proje
 
 With that in mind, instead of having code like this throughout your code base...
 
-    function add(left, right) {
-        if (typeof left !== 'number') {
-            throw new MyAssertion('left must be a number: ' + left);
-        }
+```javascript
+function add(left, right) {
+    if (typeof left !== 'number') {
+        throw new MyAssertion('left must be a number: ' + left);
+    }
 
-        if (typeof right !== 'number') {
-            throw new MyAssertion('right must be a number: ' + right);
-        }
+    if (typeof right !== 'number') {
+        throw new MyAssertion('right must be a number: ' + right);
+    }
 
-        return left + right;
-    };
+    return left + right;
+};
+```
 
 (note, in the code above, if `left` were an empty string, the resulting `error.message` would be `'left must be a number: '` -- not very helpful!)
 
 ...you can now use `yllr.check()`, which looks much nicer and is easily identified as an assertion (and allows to you instantly turn them all on/off with [`yllr.config.enableChecks()`](#enable-checks)):
 
-    function add(left, right) {
-        yllr.check(typeof left === 'number', 'left must be a number: {0}', [left]);
-        yllr.check(typeof right === 'number', 'right must be a number: {0}', [right]);
+```javascript
+function add(left, right) {
+    yllr.check(typeof left === 'number', 'left must be a number: {0}', left);
+    yllr.check(typeof right === 'number', 'right must be a number: {0}', right);
 
-        return left + right;
-    };
+    return left + right;
+};
+```
 
 Note now with the _token_ feature, if `left` were an empty string, the resulting `error.message` would be `'left must be a number: <empty>'`, which is immediately more helpful! No other special values are generated, however, since JavaScript provides adequate string representations of other built-in types:
 
@@ -81,26 +85,101 @@ When converting a `yllr.YllrError` instance to a string, the output looks like t
 
 By default, the error thrown is an instance of `yllr.YllrError` which extends from the JavaScript `Error` type. In case your code base wants all errors throw to stem from the same base error type used throughout, the error type `yllr` generates can be customized:
 
-    var MyError = function(message, tokens) {
-        ...
-    };
+```javascript
+var MyError = function(message, tokens) {
+    ...
+};
 
-    yllr.config.setErrorType(MyError);
-    yllr.check(false) // throws a new instance of `MyError`
-    yllr.config.setErrorType(); // resets to throwing new `yllr.YllrError` instances
+yllr.config.setErrorType(MyError);
+yllr.check(false) // throws a new instance of `MyError`
+yllr.config.setErrorType(); // resets to throwing new `yllr.YllrError` instances
+```
 
 ### Enable Checks
 
 By default, checks are enabled, which means any `yllr.check()` call with a _falsy_ condition will assert. All checks can be enabled or disabled with a single call:
 
-    yllr.config.enableChecks(false); // disable checks
-    yllr.config.enableChecks(); // enable checks
+```javascript
+yllr.config.enableChecks(false); // disable checks
+yllr.config.enableChecks(); // enable checks
+```
 
 ## Documentation
 
 Refer to the generated [API Documentation](dist/yllr-docs.md).
 
+## Customization
+
+Custom check can easily be added to an instance of `yllr` for your project's specific needs. Let's say you want to make it easy to check the type of variable, parameter, property, etc. You might want to add a `checkType()` method to `yllr` as well as any contextual `yllr` objects that might get created:
+
+```javascript
+// somewhere in your project's bootstrap sequence...
+(function() {
+    // @param {*|Function} condition Condition to check.
+    // @param {String} name Name of property, variable, parameter being checked.
+    // @param {(String|Array.<String>)} types Expected type, or list of expected types.
+    // @param {*} value Value that was checked.
+    var checkType = function(condition, name, types, value) {
+        types = (Object.prototype.toString.call(types) !== '[object Array]') ?
+                [types] : types;
+        this.check(condition, '{0}: expected {1}, got {2}', name, types.join(' or '),
+                value);
+    };
+
+    yllr.checkType = checkType; // add to global yllr
+
+    (function(yllrMake) {
+        yllr.make = function(context) {
+            var ctxYllr = yllrMake.call(this, context);
+
+            ctxYllr.checkType = checkType; // add to contextual yllr
+
+            return ctxYllr;
+        };
+    })(yllr.make);
+})();
+
+var foo = 1;
+yllr.checkType(typeof foo === 'string', 'foo', 'string', foo);
+// throws YllrError with message 'foo: expected string, got 1'
+
+function bar(param) {
+    yllr.checkType(function() {
+        var isArray = (Object.prototype.toString.call(param) !== '[object Array]');
+        return !param || (typeof param === 'string') || isArray;
+    }, 'param', ['falsy', 'string', 'array[string]'], param);
+
+    // ...
+};
+
+bar(2);
+// throws YllrError with message
+// 'param: expected falsy or string or array[string], got 2'
+```
+
 ## History
+
+### 1.0.0
+
+#### Enhancements
+
+*   `yllr.make()` now accepts any non-`undefined` value as a context.
+*   Contextual `yllr` object now has a `context():string` method that returns the specified context.
+*   New `yllr.onFail()` handler (also on contextual `yllr` objects) allows failed check behavior to be customized (e.g. to result in a failed assertion in NodeJS which produces a nice stack trace).
+*   New `yllr.tokenize()` is used to defer token substitution in tokenized messages so that custom failure handlers don't have to worry about having to understand how to substitute tokens in messages.
+
+#### Bug Fixes
+
+*   Only the first occurrence of a token would be replaced with its associated value. All occurrences are now replaced with its value.
+
+#### Breaking Changes
+
+*   When instantiating a new error resulting from a failed check, the error constructor is no longer called with tokens. The expected signature is now `function(message:String, context:*)` and `message` contains substituted token values.
+
+#### Other Changes
+
+*   Updated all package dependencies to comply with npm3 peer dependency changes.
+*   Added `karma:globaldebug` grunt target for debugging unit tests in the global deployment scenario.
 
 ### 0.0.5
 

@@ -1,7 +1,7 @@
 {
   "name": "yllr",
-  "version": "0.0.5",
-  "description": "minimal runtime assertion library",
+  "version": "1.0.0",
+  "description": "Minimal, extensible runtime assertion library.",
   "license": "MIT",
   "authors": [
     {

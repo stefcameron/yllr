@@ -31,90 +31,68 @@ describe('yllr (global):', function() {
           expect(err.name).toEqual('YllrError');
         });
 
-        it('should default to undefined context when falsy', function() {
+        it('should default to undefined context', function() {
           var err;
 
           err = new YllrError();
           expect(err.context).toEqual(undefined);
-
-          err = new YllrError('foo', [], undefined);
-          expect(err.context).toEqual(undefined);
-
-          err = new YllrError('foo', [], null);
-          expect(err.context).toEqual(undefined);
-
-          err = new YllrError('foo', [], false);
-          expect(err.context).toEqual(undefined);
-
-          err = new YllrError('foo', [], 0);
-          expect(err.context).toEqual(undefined);
-
-          err = new YllrError('foo', [], '');
-          expect(err.context).toEqual(undefined);
         });
 
-        it('should use any truthy context', function() {
+        it('should use any context', function() {
           var f = function() {};
           var re = /foo/;
+          var ctx;
           var err;
 
-          err = new YllrError('foo', [], 'a');
+          err = new YllrError('foo', 'a');
           expect(err.context).toEqual('a');
 
-          err = new YllrError('foo', [], []);
+          err = new YllrError('foo', []);
           expect(err.context).toEqual([]);
 
-          err = new YllrError('foo', [], {});
+          err = new YllrError('foo', {});
           expect(err.context).toEqual({});
 
-          err = new YllrError('foo', [], true);
+          ctx = {bar: 5};
+          err = new YllrError('foo', ctx);
+          expect(err.context === ctx).toEqual(true); // same reference
+
+          ctx = [1, 2, 3];
+          err = new YllrError('foo', ctx);
+          expect(err.context === ctx).toEqual(true); // same reference
+
+          ctx = function() {};
+          err = new YllrError('foo', ctx);
+          expect(err.context === ctx).toEqual(true); // same reference
+
+          err = new YllrError('foo', true);
           expect(err.context).toEqual(true);
 
-          err = new YllrError('foo', [], 1);
+          err = new YllrError('foo', 1);
           expect(err.context).toEqual(1);
 
-          err = new YllrError('foo', [], re);
+          err = new YllrError('foo', re);
           expect(err.context).toEqual(re);
 
-          err = new YllrError('foo', [], f);
+          err = new YllrError('foo', f);
           expect(err.context).toEqual(f);
+
+          err = new YllrError('foo', null);
+          expect(err.context).toEqual(null);
+
+          err = new YllrError('foo', false);
+          expect(err.context).toEqual(false);
+
+          err = new YllrError('foo', 0);
+          expect(err.context).toEqual(0);
+
+          err = new YllrError('foo', '');
+          expect(err.context).toEqual('');
         });
 
         it('should take a message', function() {
           var err = new YllrError('foo');
           expect(err.message).toEqual('foo');
-        });
-
-        it('should replace optional tokens in the message', function() {
-          var template = 'hello {0} {1}';
-          var err;
-
-          err = new YllrError(template);
-          expect(err.message).toEqual(template); // no replacement
-
-          err = new YllrError(template, []);
-          expect(err.message).toEqual(template); // no tokens to use
-
-          err = new YllrError(template, ['a']);
-          expect(err.message).toEqual('hello a {1}'); // only {0} replaced
-
-          err = new YllrError(template, ['a', 'b']);
-          expect(err.message).toEqual('hello a b'); // all replaced
-
-          err = new YllrError(template, ['a', 'b', 'c']);
-          expect(err.message).toEqual('hello a b'); // extra tokens ignored
-
-          // non-string tokens are converted to strings
-          err = new YllrError(template, [1, {}]);
-          expect(err.message).toEqual('hello 1 ' + {}.toString());
-
-          // bad token list type
-          expect(function() { new YllrError(template, {}); }).toThrow();
-        });
-
-        it('should replace empty string tokens with special string', function() {
-          var err = new YllrError('{0}', ['']);
-          expect(err.message).toEqual('<empty>');
         });
 
         it('should have specialized toString representation', function() {
@@ -123,7 +101,7 @@ describe('yllr (global):', function() {
           err = new YllrError('foo'); // no context
           expect('' + err).toEqual('YllrError: foo');
 
-          err = new YllrError('foo', [], 'context');
+          err = new YllrError('foo', 'context');
           expect('' + err).toEqual('YllrError: context: foo');
         });
       }); // YllrError
@@ -189,6 +167,11 @@ describe('yllr (global):', function() {
               .toThrow(new YllrError('must be in: 1,2'));
         });
 
+        it('should replace multiple instances of the same token', function() {
+          expect(function() { yllr.check(false, '{0} {0} {0}', 'must', 'be', true); })
+              .toThrow(new YllrError('must must must'));
+        });
+
         it('should call condition function', function() {
           var result;
           var condition = function() {
@@ -208,43 +191,102 @@ describe('yllr (global):', function() {
           expect(_.isFunction(yllr.make)).toEqual(true);
         });
 
-        it('should require a non-empty string as context', function() {
-          expect(function() { yllr.make(); }).toThrow();
-          expect(function() { yllr.make(undefined); }).toThrow();
-          expect(function() { yllr.make(null); }).toThrow();
-          expect(function() { yllr.make(''); }).toThrow();
-          expect(function() { yllr.make(0); }).toThrow();
-          expect(function() { yllr.make(1); }).toThrow();
-          expect(function() { yllr.make(true); }).toThrow();
-          expect(function() { yllr.make(false); }).toThrow();
-          expect(function() { yllr.make({}); }).toThrow();
-          expect(function() { yllr.make([]); }).toThrow();
-          expect(function() { yllr.make(/foo/); }).toThrow();
-          expect(function() { yllr.make(function() {}); }).toThrow();
-
+        it('should use any value as context except undefined', function() {
+          expect(function() { yllr.make(); }).not.toThrow();
+          expect(function() { yllr.make(undefined); }).not.toThrow();
+          expect(function() { yllr.make(null); }).not.toThrow();
+          expect(function() { yllr.make(''); }).not.toThrow();
+          expect(function() { yllr.make(0); }).not.toThrow();
+          expect(function() { yllr.make(1); }).not.toThrow();
+          expect(function() { yllr.make(true); }).not.toThrow();
+          expect(function() { yllr.make(false); }).not.toThrow();
+          expect(function() { yllr.make({}); }).not.toThrow();
+          expect(function() { yllr.make([]); }).not.toThrow();
+          expect(function() { yllr.make(/foo/); }).not.toThrow();
+          expect(function() { yllr.make(function() {}); }).not.toThrow();
           expect(function() { yllr.make('a'); }).not.toThrow();
         });
 
-        it('should generate a yllr object with check method', function() {
-          var y = yllr.make('foo');
-
-          expect(Object.keys(y)).toEqual([]); // no instance properties
-
-          // only one method, defined on the __proto__
-          expect(Object.keys(Object.getPrototypeOf(y))).toEqual(['check']);
+        it('should interpret undefined context as null', function() {
+          expect(yllr.make(undefined).context).toEqual(null);
         });
 
-        it('generated yllr object check should be contextual', function() {
-          var y = yllr.make('foo');
+        describe('context yllr object:', function() {
+          it('should have expected methods', function() {
+            var y = yllr.make('foo');
 
-          try {
-            y.check(false, 'bar');
-          } catch (err) {
-            expect(err instanceof yllr.YllrError).toEqual(true);
-            expect(err.name).toEqual('YllrError');
-            expect(err.message).toEqual('bar');
-            expect(err.context).toEqual('foo');
-          }
+            expect(Object.keys(y)).toEqual([]); // no instance properties
+
+            // proeprties/methods defined on the __proto__
+            expect(Object.keys(Object.getPrototypeOf(y))).toEqual([
+              'context',
+              'check',
+              'onFail'
+            ]);
+
+            expect(y.context).toBeDefined();
+            expect(_.isFunction(y.check)).toEqual(true);
+            expect(_.isFunction(y.onFail)).toEqual(true);
+          });
+
+          it('should provide its context', function() {
+            var ctx = {foo: 3};
+            var y = yllr.make(ctx);
+
+            expect(y.context === ctx).toEqual(true); // same reference
+          });
+
+          it('should be contextual', function() {
+            var y = yllr.make('foo');
+
+            try {
+              y.check(false, 'bar');
+            } catch (err) {
+              expect(err instanceof yllr.YllrError).toEqual(true);
+              expect(err.name).toEqual('YllrError');
+              expect(err.message).toEqual('bar');
+              expect(err.context).toEqual('foo');
+            }
+          });
+
+          describe('onFail():', function() {
+            it('should be called when a check fails', function() {
+              var y = yllr.make('ctx');
+
+              spyOn(y, 'onFail');
+              spyOn(yllr, 'onFail');
+
+              y.check(false, 'foo');
+              expect(yllr.onFail).not.toHaveBeenCalled();
+              expect(y.onFail).toHaveBeenCalledWith('foo', []);
+              expect(y.onFail.calls.mostRecent().object === y).toEqual(true);
+
+              y.check(false, 'foo', 'bar');
+              expect(yllr.onFail).not.toHaveBeenCalled();
+              expect(y.onFail).toHaveBeenCalledWith('foo', ['bar']);
+              expect(y.onFail.calls.mostRecent().object === y).toEqual(true);
+
+              y.check(false, 'foo', ['bar', 2]);
+              expect(yllr.onFail).not.toHaveBeenCalled();
+              expect(y.onFail).toHaveBeenCalledWith('foo', ['bar', 2]);
+              expect(y.onFail.calls.mostRecent().object === y).toEqual(true);
+
+              y.check(false, 'foo', 'bar', 2);
+              expect(yllr.onFail).not.toHaveBeenCalled();
+              expect(y.onFail).toHaveBeenCalledWith('foo', ['bar', 2]);
+              expect(y.onFail.calls.mostRecent().object === y).toEqual(true);
+
+              y.check(false, 'foo', [['bar', 2]]);
+              expect(yllr.onFail).not.toHaveBeenCalled();
+              expect(y.onFail).toHaveBeenCalledWith('foo', [['bar', 2]]);
+              expect(y.onFail.calls.mostRecent().object === y).toEqual(true);
+
+              y.check(false, 'foo', ['bar', 2], 3);
+              expect(yllr.onFail).not.toHaveBeenCalled();
+              expect(y.onFail).toHaveBeenCalledWith('foo', [['bar', 2], 3]);
+              expect(y.onFail.calls.mostRecent().object === y).toEqual(true);
+            });
+          }); // onFail()
         });
 
         describe('context yllr message tokens:', function() {
@@ -275,8 +317,143 @@ describe('yllr (global):', function() {
             expect(function() { ctxYllr.check(false, 'must be in: {0}', [[1, 2]]); })
                 .toThrow(new YllrError('must be in: 1,2'));
           });
+
+          it('should replace multiple instances of the same token', function() {
+            expect(function() { ctxYllr.check(false, '{0} {0} {0}', 'must', 'be', true); })
+                .toThrow(new YllrError('must must must'));
+          });
         }); // context yllr message tokens
       }); // make()
+
+      describe('onFail():', function() {
+        it('should be included', function() {
+          expect(_.isFunction(yllr.onFail)).toEqual(true);
+        });
+
+        it('should be called when a check fails', function() {
+          spyOn(yllr, 'onFail');
+
+          yllr.check(false, 'foo');
+          expect(yllr.onFail).toHaveBeenCalledWith('foo', []);
+          expect(yllr.onFail.calls.mostRecent().object === yllr).toEqual(true);
+
+          yllr.check(false, 'foo', 'bar');
+          expect(yllr.onFail).toHaveBeenCalledWith('foo', ['bar']);
+          expect(yllr.onFail.calls.mostRecent().object === yllr).toEqual(true);
+
+          yllr.check(false, 'foo', ['bar', 2]);
+          expect(yllr.onFail).toHaveBeenCalledWith('foo', ['bar', 2]);
+          expect(yllr.onFail.calls.mostRecent().object === yllr).toEqual(true);
+
+          yllr.check(false, 'foo', 'bar', 2);
+          expect(yllr.onFail).toHaveBeenCalledWith('foo', ['bar', 2]);
+          expect(yllr.onFail.calls.mostRecent().object === yllr).toEqual(true);
+
+          yllr.check(false, 'foo', [['bar', 2]]);
+          expect(yllr.onFail).toHaveBeenCalledWith('foo', [['bar', 2]]);
+          expect(yllr.onFail.calls.mostRecent().object === yllr).toEqual(true);
+
+          yllr.check(false, 'foo', ['bar', 2], 3);
+          expect(yllr.onFail).toHaveBeenCalledWith('foo', [['bar', 2], 3]);
+          expect(yllr.onFail.calls.mostRecent().object === yllr).toEqual(true);
+        });
+      }); // onFail()
+
+      describe('tokenize():', function() {
+        it('should be included', function() {
+          expect(_.isFunction(yllr.tokenize)).toEqual(true);
+        });
+
+        it('should be called when a check fails with default onFail() ' +
+              'and context arg should be undefined', function() {
+
+          spyOn(yllr, 'tokenize').and.callThrough();
+
+          expect(function() { yllr.check(false, 'foo'); }).toThrow();
+          expect(yllr.tokenize).toHaveBeenCalledWith('foo', [], undefined);
+          expect(yllr.tokenize.calls.mostRecent().object === yllr).toEqual(true);
+
+          expect(function() { yllr.check(false, 'foo', 'bar'); }).toThrow();
+          expect(yllr.tokenize).toHaveBeenCalledWith('foo', ['bar'], undefined);
+          expect(yllr.tokenize.calls.mostRecent().object === yllr).toEqual(true);
+
+          expect(function() { yllr.check(false, 'foo', ['bar', 2]); }).toThrow();
+          expect(yllr.tokenize).toHaveBeenCalledWith('foo', ['bar', 2], undefined);
+          expect(yllr.tokenize.calls.mostRecent().object === yllr).toEqual(true);
+
+          expect(function() { yllr.check(false, 'foo', 'bar', 2); }).toThrow();
+          expect(yllr.tokenize).toHaveBeenCalledWith('foo', ['bar', 2], undefined);
+          expect(yllr.tokenize.calls.mostRecent().object === yllr).toEqual(true);
+
+          expect(function() { yllr.check(false, 'foo', [['bar', 2]]); }).toThrow();
+          expect(yllr.tokenize).toHaveBeenCalledWith('foo', [['bar', 2]], undefined);
+          expect(yllr.tokenize.calls.mostRecent().object === yllr).toEqual(true);
+
+          expect(function() { yllr.check(false, 'foo', ['bar', 2], 3); }).toThrow();
+          expect(yllr.tokenize).toHaveBeenCalledWith('foo', [['bar', 2], 3], undefined);
+          expect(yllr.tokenize.calls.mostRecent().object === yllr).toEqual(true);
+        });
+
+        it('should be called when a contextual check fails with default onFail() ' +
+              'and context arg should be as specified', function() {
+
+          var ctx = ['ctx'];
+          var y = yllr.make(ctx);
+
+          spyOn(yllr, 'tokenize').and.callThrough();
+
+          // NOTE: execution context should always be the global, not the contextual
+
+          expect(function() { y.check(false, 'foo'); }).toThrow();
+          expect(yllr.tokenize).toHaveBeenCalledWith('foo', [], ctx);
+          expect(yllr.tokenize.calls.mostRecent().object === yllr).toEqual(true);
+
+          expect(function() { y.check(false, 'foo', 'bar'); }).toThrow();
+          expect(yllr.tokenize).toHaveBeenCalledWith('foo', ['bar'], ctx);
+          expect(yllr.tokenize.calls.mostRecent().object === yllr).toEqual(true);
+
+          expect(function() { y.check(false, 'foo', ['bar', 2]); }).toThrow();
+          expect(yllr.tokenize).toHaveBeenCalledWith('foo', ['bar', 2], ctx);
+          expect(yllr.tokenize.calls.mostRecent().object === yllr).toEqual(true);
+
+          expect(function() { y.check(false, 'foo', 'bar', 2); }).toThrow();
+          expect(yllr.tokenize).toHaveBeenCalledWith('foo', ['bar', 2], ctx);
+          expect(yllr.tokenize.calls.mostRecent().object === yllr).toEqual(true);
+
+          expect(function() { y.check(false, 'foo', [['bar', 2]]); }).toThrow();
+          expect(yllr.tokenize).toHaveBeenCalledWith('foo', [['bar', 2]], ctx);
+          expect(yllr.tokenize.calls.mostRecent().object === yllr).toEqual(true);
+
+          expect(function() { y.check(false, 'foo', ['bar', 2], 3); }).toThrow();
+          expect(yllr.tokenize).toHaveBeenCalledWith('foo', [['bar', 2], 3], ctx);
+          expect(yllr.tokenize.calls.mostRecent().object === yllr).toEqual(true);
+        });
+
+        it('should replace tokens in the message', function() {
+          var template = 'hello {0} {1}';
+
+          // no replacement
+          expect(yllr.tokenize(template)).toEqual(template);
+          // no tokens to use
+          expect(yllr.tokenize(template, [])).toEqual(template);
+          // only {0} replaced
+          expect(yllr.tokenize(template, ['a'])).toEqual('hello a {1}');
+          // all replaced
+          expect(yllr.tokenize(template, ['a', 'b'])).toEqual('hello a b');
+          // extra tokens ignored
+          expect(yllr.tokenize(template, ['a', 'b', 'c'])).toEqual('hello a b');
+          // non-string tokens are converted to strings
+          expect(yllr.tokenize(template, [1, {}])).toEqual('hello 1 ' + {}.toString());
+        });
+
+        it('should replace multiple instances of the same token', function() {
+          expect(yllr.tokenize('{0} {0} {0}', ['foo'])).toEqual('foo foo foo');
+        });
+
+        it('should replace empty string tokens with special string', function() {
+          expect(yllr.tokenize('{0}', [''])).toEqual('<empty>');
+        });
+      }); // tokenize()
     }); // functions
   }); // library
 
@@ -310,23 +487,10 @@ describe('yllr (global):', function() {
             yllr.config.setErrorType(OtherError);
           }).not.toThrow();
 
-          try {
-            yllr.check(false);
-          } catch(err) {
-            expect(err instanceof OtherError).toEqual(true);
-          }
+          expect(function() { yllr.check(false); }).toThrowError(OtherError);
         });
 
-        it('should not allow setting invalid alternate error types', function() {
-          expect(function() { yllr.config.setErrorType(1); }).toThrow();
-          expect(function() { yllr.config.setErrorType(true); }).toThrow();
-          expect(function() { yllr.config.setErrorType({}); }).toThrow();
-          expect(function() { yllr.config.setErrorType([]); }).toThrow();
-          expect(function() { yllr.config.setErrorType(/foo/); }).toThrow();
-          expect(function() { yllr.config.setErrorType('foo'); }).toThrow();
-        });
-
-        describe('should reset error type given falsy values:', function() {
+        describe('should reset error type given invalid values:', function() {
           var YllrError = yllr.YllrError;
 
           beforeEach(function() {
@@ -335,47 +499,57 @@ describe('yllr (global):', function() {
 
           it('0', function() {
             yllr.config.setErrorType(0);
-            try {
-              yllr.check(false);
-            } catch(err) {
-              expect(err instanceof YllrError).toEqual(true);
-            }
+            expect(function() { yllr.check(false); }).toThrowError(YllrError);
           });
 
           it('false', function() {
             yllr.config.setErrorType(false);
-            try {
-              yllr.check(false);
-            } catch(err) {
-              expect(err instanceof YllrError).toEqual(true);
-            }
+            expect(function() { yllr.check(false); }).toThrowError(YllrError);
           });
 
           it('undefined', function() {
             yllr.config.setErrorType();
-            try {
-              yllr.check(false);
-            } catch(err) {
-              expect(err instanceof YllrError).toEqual(true);
-            }
+            expect(function() { yllr.check(false); }).toThrowError(YllrError);
           });
 
           it('null', function() {
             yllr.config.setErrorType(null);
-            try {
-              yllr.check(false);
-            } catch(err) {
-              expect(err instanceof YllrError).toEqual(true);
-            }
+            expect(function() { yllr.check(false); }).toThrowError(YllrError);
           });
 
           it('<empty>', function() {
             yllr.config.setErrorType('');
-            try {
-              yllr.check(false);
-            } catch(err) {
-              expect(err instanceof YllrError).toEqual(true);
-            }
+            expect(function() { yllr.check(false); }).toThrowError(YllrError);
+          });
+
+          it('1', function() {
+            yllr.config.setErrorType(1);
+            expect(function() { yllr.check(false); }).toThrowError(yllr.YllrError);
+          });
+
+          it('true', function() {
+            yllr.config.setErrorType(true);
+            expect(function() { yllr.check(false); }).toThrowError(yllr.YllrError);
+          });
+
+          it('{}', function() {
+            yllr.config.setErrorType({});
+            expect(function() { yllr.check(false); }).toThrowError(yllr.YllrError);
+          });
+
+          it('[]', function() {
+            yllr.config.setErrorType([]);
+            expect(function() { yllr.check(false); }).toThrowError(yllr.YllrError);
+          });
+
+          it('/foo/', function() {
+            yllr.config.setErrorType(/foo/);
+            expect(function() { yllr.check(false); }).toThrowError(yllr.YllrError);
+          });
+
+          it('foo', function() {
+            yllr.config.setErrorType('foo');
+            expect(function() { yllr.check(false); }).toThrowError(yllr.YllrError);
           });
         }); // reset on falsy values
       }); // setErrorType()

@@ -91,6 +91,21 @@ module.exports = function(grunt) {
         configFile: 'test/karma-conf-unit.js'
       },
 
+      // @target unit test with global deployment, but without code coverage and
+      //  browsers (for debugging tests since code coverage mangles the source),
+      //  waiting for browser connections rather than performing just a 'single run'
+      globaldebug: {
+        configFile: 'test/karma-conf-unit.js',
+
+        // these options override what's in the config file
+        options: {
+          singleRun: false,
+          browsers: [],
+          preprocessors: {},
+          reporters: ['progress']
+        }
+      },
+
       // @target unit test with AMD deployment
       amd: {
         configFile: 'test/karma-conf-unit.js',
