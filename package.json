@@ -45,7 +45,7 @@
     "grunt-contrib-uglify": "1.0.1",
     "grunt-contrib-watch": "1.0.0",
     "grunt-jscs": "3.0.1",
-    "grunt-jsdoc-to-markdown": "1.2.1",
+    "grunt-jsdoc-to-markdown": "5.0.0",
     "grunt-karma": "2.0.0",
     "jasmine-core": "2.4.1",
     "karma": "1.1.0",
