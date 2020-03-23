@@ -47,7 +47,7 @@
     "grunt-jscs": "3.0.1",
     "grunt-jsdoc-to-markdown": "1.2.1",
     "grunt-karma": "2.0.0",
-    "jasmine-core": "2.4.1",
+    "jasmine-core": "3.5.0",
     "karma": "1.1.0",
     "karma-chrome-launcher": "1.0.1",
     "karma-coverage": "1.0.0",
