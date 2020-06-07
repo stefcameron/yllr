@@ -159,6 +159,10 @@ bar(2);
 
 ## History
 
+### 1.1.0
+
+*   Updated all dependencies to their latest versions. No functionality changes.
+
 ### 1.0.0
 
 #### Enhancements
