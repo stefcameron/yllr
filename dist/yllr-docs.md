@@ -13,7 +13,7 @@ The `yllr` library.
         * [new YllrError(message, [context])](#new_yllr.YllrError_new)
         * [.message](#yllr.YllrError+message) : <code>String</code>
         * [.name](#yllr.YllrError+name) : <code>String</code>
-        * [.context](#yllr.YllrError+context) : <code>Object</code> &#124; <code>undefined</code>
+        * [.context](#yllr.YllrError+context) : <code>Object</code> \| <code>undefined</code>
         * [.toString()](#yllr.YllrError+toString) ⇒ <code>String</code>
     * [.Yllr](#yllr.Yllr)
         * [new Yllr()](#new_yllr.Yllr_new)
@@ -21,7 +21,7 @@ The `yllr` library.
         * [.check(condition, [message], [...tokens])](#yllr.Yllr+check)
         * [.onFail(message, tokens)](#yllr.Yllr+onFail)
     * [.config](#yllr.config) : <code>object</code>
-        * [.noConflict()](#yllr.config.noConflict) ⇒ <code>[yllr](#yllr)</code>
+        * [.noConflict()](#yllr.config.noConflict) ⇒ [<code>yllr</code>](#yllr)
         * [.setErrorType([ErrorType])](#yllr.config.setErrorType)
         * [.enableChecks([enable])](#yllr.config.enableChecks)
         * [.checksEnabled()](#yllr.config.checksEnabled) ⇒ <code>Boolean</code>
@@ -33,14 +33,14 @@ The `yllr` library.
 <a name="yllr.YllrError"></a>
 
 ## yllr.YllrError
-**Kind**: static class of <code>[yllr](#yllr)</code>  
+**Kind**: static class of [<code>yllr</code>](#yllr)  
 **See**: [`yllr.make`](#yllr.make)  
 
 * [.YllrError](#yllr.YllrError)
     * [new YllrError(message, [context])](#new_yllr.YllrError_new)
     * [.message](#yllr.YllrError+message) : <code>String</code>
     * [.name](#yllr.YllrError+name) : <code>String</code>
-    * [.context](#yllr.YllrError+context) : <code>Object</code> &#124; <code>undefined</code>
+    * [.context](#yllr.YllrError+context) : <code>Object</code> \| <code>undefined</code>
     * [.toString()](#yllr.YllrError+toString) ⇒ <code>String</code>
 
 <a name="new_yllr.YllrError_new"></a>
@@ -54,38 +54,38 @@ Defines the error that is thrown by default when a check fails.
 | Param | Type | Description |
 | --- | --- | --- |
 | message | <code>String</code> | The error message. |
-| [context] | <code>Object</code> &#124; <code>undefined</code> | Optional context object to associate  with the error. An `undefined` value equates to no context. If this error  is being instantiated from a _contextual yllr object_, this parameter should  be the associated context. |
+| [context] | <code>Object</code> \| <code>undefined</code> | Optional context object to associate  with the error. An `undefined` value equates to no context. If this error  is being instantiated from a _contextual yllr object_, this parameter should  be the associated context. |
 
 <a name="yllr.YllrError+message"></a>
 
 ### yllrError.message : <code>String</code>
 Error message.
 
-**Kind**: instance property of <code>[YllrError](#yllr.YllrError)</code>  
+**Kind**: instance property of [<code>YllrError</code>](#yllr.YllrError)  
 <a name="yllr.YllrError+name"></a>
 
 ### yllrError.name : <code>String</code>
 Error name/code.
 
-**Kind**: instance property of <code>[YllrError](#yllr.YllrError)</code>  
+**Kind**: instance property of [<code>YllrError</code>](#yllr.YllrError)  
 <a name="yllr.YllrError+context"></a>
 
-### yllrError.context : <code>Object</code> &#124; <code>undefined</code>
+### yllrError.context : <code>Object</code> \| <code>undefined</code>
 Error context, if specified; `undefined` if there is no context.
 
-**Kind**: instance property of <code>[YllrError](#yllr.YllrError)</code>  
+**Kind**: instance property of [<code>YllrError</code>](#yllr.YllrError)  
 <a name="yllr.YllrError+toString"></a>
 
 ### yllrError.toString() ⇒ <code>String</code>
 [[overrides: `JavaScript.Error.toString()`]]
 Generates a string representation of this error.
 
-**Kind**: instance method of <code>[YllrError](#yllr.YllrError)</code>  
+**Kind**: instance method of [<code>YllrError</code>](#yllr.YllrError)  
 **Returns**: <code>String</code> - A string representation of this error.  
 <a name="yllr.Yllr"></a>
 
 ## yllr.Yllr
-**Kind**: static class of <code>[yllr](#yllr)</code>  
+**Kind**: static class of [<code>yllr</code>](#yllr)  
 
 * [.Yllr](#yllr.Yllr)
     * [new Yllr()](#new_yllr.Yllr_new)
@@ -108,13 +108,13 @@ The context associated with this `yllr` object. Note that `null` is
  technically an object and therefore a valid context. This property
  should not be `undefined` given how [`yllr.make()`](#yllr.make) works.
 
-**Kind**: instance property of <code>[Yllr](#yllr.Yllr)</code>  
+**Kind**: instance property of [<code>Yllr</code>](#yllr.Yllr)  
 <a name="yllr.Yllr+check"></a>
 
 ### yllr.check(condition, [message], [...tokens])
 Perform a contextual condition check.
 
-**Kind**: instance method of <code>[Yllr](#yllr.Yllr)</code>  
+**Kind**: instance method of [<code>Yllr</code>](#yllr.Yllr)  
 **See**: [`yllr.check`](#yllr.check)  
 
 | Param | Type | Description |
@@ -131,12 +131,12 @@ Handle a contextual check failure.
 Override this method to customize the behavior of a failed contextual
  check.
 
-**Kind**: instance method of <code>[Yllr](#yllr.Yllr)</code>  
+**Kind**: instance method of [<code>Yllr</code>](#yllr.Yllr)  
 **See**: [`yllr.onFail`](#yllr.onFail)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| message | <code>String</code> &#124; <code>undefined</code> | Associated message, if any. |
+| message | <code>String</code> \| <code>undefined</code> | Associated message, if any. |
 | tokens | <code>Array</code> | Tokens, if any; empty if none. |
 
 <a name="yllr.config"></a>
@@ -144,17 +144,17 @@ Override this method to customize the behavior of a failed contextual
 ## yllr.config : <code>object</code>
 Configuration options.
 
-**Kind**: static namespace of <code>[yllr](#yllr)</code>  
+**Kind**: static namespace of [<code>yllr</code>](#yllr)  
 
 * [.config](#yllr.config) : <code>object</code>
-    * [.noConflict()](#yllr.config.noConflict) ⇒ <code>[yllr](#yllr)</code>
+    * [.noConflict()](#yllr.config.noConflict) ⇒ [<code>yllr</code>](#yllr)
     * [.setErrorType([ErrorType])](#yllr.config.setErrorType)
     * [.enableChecks([enable])](#yllr.config.enableChecks)
     * [.checksEnabled()](#yllr.config.checksEnabled) ⇒ <code>Boolean</code>
 
 <a name="yllr.config.noConflict"></a>
 
-### config.noConflict() ⇒ <code>[yllr](#yllr)</code>
+### config.noConflict() ⇒ [<code>yllr</code>](#yllr)
 Restores the previous value of `global.yllr` (i.e. `window.yllr`) and
  returns a reference to the `yllr` library.
 
@@ -165,14 +165,14 @@ This configuration function only exists if the library was registered
 Once this function is called, it will be removed (i.e. it can only be
  called once).
 
-**Kind**: static method of <code>[config](#yllr.config)</code>  
-**Returns**: <code>[yllr](#yllr)</code> - Reference to the `yllr` library.  
+**Kind**: static method of [<code>config</code>](#yllr.config)  
+**Returns**: [<code>yllr</code>](#yllr) - Reference to the `yllr` library.  
 <a name="yllr.config.setErrorType"></a>
 
 ### config.setErrorType([ErrorType])
 Customizes the type of error thrown when a `check` fails.
 
-**Kind**: static method of <code>[config](#yllr.config)</code>  
+**Kind**: static method of [<code>config</code>](#yllr.config)  
 **See**: [`yllr.YllrError`](#yllr.YllrError)  
 
 | Param | Type | Description |
@@ -185,7 +185,7 @@ Customizes the type of error thrown when a `check` fails.
 Allows enabling or disabling all checks. Subsequent calls to `yllr.check`
  will cause failures if enabled, or do nothing if disabled.
 
-**Kind**: static method of <code>[config](#yllr.config)</code>  
+**Kind**: static method of [<code>config</code>](#yllr.config)  
 **See**: [`yllr.config.checksEnabled()`](#yllr.config.checksEnabled)  
 
 | Param | Type | Default | Description |
@@ -197,7 +197,7 @@ Allows enabling or disabling all checks. Subsequent calls to `yllr.check`
 ### config.checksEnabled() ⇒ <code>Boolean</code>
 Determines if all checks are enabled; a compliment to `config.enableChecks()`.
 
-**Kind**: static method of <code>[config](#yllr.config)</code>  
+**Kind**: static method of [<code>config</code>](#yllr.config)  
 **Returns**: <code>Boolean</code> - `true` if all checks are enabled; `false` otherwise.  
 **See**: [`yllr.config.enableChecks()`](#yllr.config.enableChecks)  
 <a name="yllr.tokenize"></a>
@@ -205,7 +205,7 @@ Determines if all checks are enabled; a compliment to `config.enableChecks()`.
 ## yllr.tokenize(message, tokens, [context]) ⇒ <code>String</code>
 Replace any tokens in a given message.
 
-**Kind**: static method of <code>[yllr](#yllr)</code>  
+**Kind**: static method of [<code>yllr</code>](#yllr)  
 **Returns**: <code>String</code> - Message with tokens substituted; empty string if `message`
  was _falsy_.  
 
@@ -213,7 +213,7 @@ Replace any tokens in a given message.
 | --- | --- | --- |
 | message | <code>String</code> | Message containing `{n}`-style tokens. If _falsy_,  it's considered to be an empty strig. |
 | tokens | <code>Array</code> | Token values. Any tokens which aren't strings are  cast to strings. |
-| [context] | <code>Object</code> &#124; <code>undefined</code> | Optional context associated with the  `message`. An `undefined` value equates to no context. __Note:__ the current  implementation ignores this parameter. |
+| [context] | <code>Object</code> \| <code>undefined</code> | Optional context associated with the  `message`. An `undefined` value equates to no context. __Note:__ the current  implementation ignores this parameter. |
 
 <a name="yllr.onFail"></a>
 
@@ -252,7 +252,7 @@ y.onFail = function(message, tokens) {
 })(yllr.make);
 ```
 
-**Kind**: static method of <code>[yllr](#yllr)</code>  
+**Kind**: static method of [<code>yllr</code>](#yllr)  
 **See**
 
 - [`yllr.check()`](#yllr.check)
@@ -262,7 +262,7 @@ y.onFail = function(message, tokens) {
 
 | Param | Type | Description |
 | --- | --- | --- |
-| message | <code>String</code> &#124; <code>undefined</code> | Failed check message (may contain tokens).  If _falsy_ (because a message wasn't provided for the failed check), a default  message is used. The [tokenize](#yllr.tokenize) function is used to substitute any  tokens into the `message`. |
+| message | <code>String</code> \| <code>undefined</code> | Failed check message (may contain tokens).  If _falsy_ (because a message wasn't provided for the failed check), a default  message is used. The [tokenize](#yllr.tokenize) function is used to substitute any  tokens into the `message`. |
 | tokens | <code>Array</code> | Token values to substitute into `message`. Empty  array if none were given for the failed check. |
 
 <a name="yllr.check"></a>
@@ -270,7 +270,7 @@ y.onFail = function(message, tokens) {
 ## yllr.check(condition, [message], [...tokens])
 Check a condition.
 
-**Kind**: static method of <code>[yllr](#yllr)</code>  
+**Kind**: static method of [<code>yllr</code>](#yllr)  
 **See**
 
 - [`yllr.make`](#yllr.make)
@@ -289,7 +289,7 @@ Check a condition.
 Make a new contextual `yllr` object. The `context` is passed to the
  [error type](#yllr.config.setErrorType) constructor when a check fails.
 
-**Kind**: static method of <code>[yllr](#yllr)</code>  
+**Kind**: static method of [<code>yllr</code>](#yllr)  
 
 | Param | Type | Description |
 | --- | --- | --- |

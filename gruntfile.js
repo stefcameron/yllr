@@ -235,7 +235,7 @@ module.exports = function(grunt) {
     // @task generate markdown API documentation
     jsdoc2md: {
       options: {
-        'private': false, // exclude @private content
+        // 'private': false, // exclude @private content
         'heading-depth': 1
       },
 
