@@ -57,7 +57,7 @@
     "karma-jasmine": "4.0.1",
     "karma-phantomjs-launcher": "1.0.4",
     "karma-safari-launcher": "1.0.0",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "phantomjs-prebuilt": "2.1.16"
   }
 }
